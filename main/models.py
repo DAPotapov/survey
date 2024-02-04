@@ -2,32 +2,33 @@ from django.db import models
 
 
 # Create your models here.
-class surveys(models.Model):
-    survey = models.CharField(verbose_name="Название", max_length=100)
+class Surveys(models.Model):
+    survey_title = models.CharField(verbose_name="Название", max_length=100)
     description = models.TextField(verbose_name="Описание")
 
     def __str__(self) -> str:
-        return self.survey
+        return self.survey_title
 
 
-class questions(models.Model):
-    question = models.CharField(verbose_name="Вопрос", max_length=255)
+class Questions(models.Model):
+    question_text = models.CharField(verbose_name="Вопрос", max_length=255)
     specifics = models.TextField(verbose_name="Подробности вопроса")
-    survey = models.ForeignKey(surveys, on_delete=models.CASCADE)
+    survey = models.ForeignKey(Surveys, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return self.question
+        return self.question_text
 
 
-class choices(models.Model):
-    choice = models.CharField(verbose_name="Вариант ответа", max_length=255)
-    question = models.ForeignKey(questions, on_delete=models.CASCADE)
+class Choices(models.Model):
+    choice_text = models.CharField(verbose_name="Вариант ответа", max_length=255)
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return self.choice
+        return self.choice_text
 
 
-class users(models.Model):
+# TODO Do I need user here?
+class Users(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=100)
     surname = models.CharField(verbose_name="Фамилия", max_length=100)
 
@@ -35,13 +36,13 @@ class users(models.Model):
         return self.name + " " + self.surname
 
 
-class user_activity(models.Model):
-    user = models.ForeignKey(users, on_delete=models.CASCADE)
+class UsersActivity(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
     # Do I need survey here? Because it already linked with question
     # survey = models.ForeignKey(surveys, on_delete=models.CASCADE)
-    question = models.ForeignKey(questions, on_delete=models.CASCADE)
-    choice = models.ForeignKey(choices, on_delete=models.CASCADE)
+    question = models.ForeignKey(Questions, on_delete=models.CASCADE)
+    choice = models.ForeignKey(Choices, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         # TODO What should I return here?
-        return self.user.name
+        return self.user.name  # This will not work
