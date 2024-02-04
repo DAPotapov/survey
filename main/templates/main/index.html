@@ -5,5 +5,17 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Наверное, здесь вопрос запихну или название опроса</h1>
+    <h1>{{ header }}</h1>
+    <div class="container-sm">
+        <form action="/start_survey" method="post">
+        {% for survey in surveys %}           
+
+            <input type="radio" class="btn-check" name="options-base" id="option{{ loop.index }}" value="{{ loop.index }}" autocomplete="off">
+            <label class="btn" for="option{{ loop.index }}">{{ survey.survey_title }}</label>
+            
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Начать опрос</button>
+        </form>
+    </div>  
+
 {% endblock %}

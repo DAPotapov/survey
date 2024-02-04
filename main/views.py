@@ -1,6 +1,12 @@
 from django.shortcuts import render
+from .models import Question, Choice, Survey
 
 
 # Create your views here.
 def index(request):
-    return render(request, 'main/index.html')
+    surveys = Survey.objects.all()
+    content = {
+        'header': "Доступные опросы",
+        'surveys': surveys
+    }
+    return render(request, 'main/index.html', content)
