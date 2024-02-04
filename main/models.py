@@ -9,22 +9,23 @@ class surveys(models.Model):
     def __str__(self) -> str:
         return self.survey
 
+
 class questions(models.Model):
-    question = models.CharField(verbose_name="Вопрос")
+    question = models.CharField(verbose_name="Вопрос", max_length=255)
     specifics = models.TextField(verbose_name="Подробности вопроса")
     survey = models.ForeignKey(surveys, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.question
-    
+
 
 class choices(models.Model):
-    choice = models.CharField(verbose_name="Вариант ответа")
+    choice = models.CharField(verbose_name="Вариант ответа", max_length=255)
     question = models.ForeignKey(questions, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.choice
-    
+
 
 class users(models.Model):
     name = models.CharField(verbose_name="Имя", max_length=100)
@@ -32,15 +33,15 @@ class users(models.Model):
 
     def __str__(self) -> str:
         return self.name + " " + self.surname
-    
+
 
 class user_activity(models.Model):
     user = models.ForeignKey(users, on_delete=models.CASCADE)
     # Do I need survey here? Because it already linked with question
-    # survey = models.ForeignKey(surveys, on_delete=models.CASCADE) 
+    # survey = models.ForeignKey(surveys, on_delete=models.CASCADE)
     question = models.ForeignKey(questions, on_delete=models.CASCADE)
     choice = models.ForeignKey(choices, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         # TODO What should I return here?
-        return self.user.name 
+        return self.user.name
