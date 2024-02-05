@@ -6,8 +6,10 @@
 
 {% block main %}
     <h1>{{ header }}</h1>
+    {% if surveys %}
     <div class="container-sm">
         <form action="/start_survey" method="post">
+        {% csrf_token %}
         {% for survey in surveys %}           
 
             <input type="radio" class="btn-check" name="options-base" id="option{{ loop.index }}" value="{{ loop.index }}" autocomplete="off">
@@ -16,6 +18,7 @@
         {% endfor %}
         <button class="btn btn-primary" type="submit">Начать опрос</button>
         </form>
-    </div>  
+    </div>
+    {% endif %}  
 
 {% endblock %}
