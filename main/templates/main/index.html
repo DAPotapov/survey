@@ -6,14 +6,15 @@
 
 {% block main %}
     <h1>{{ header }}</h1>
-    {% if surveys %}
+    {% if choices %}
     <div class="container-sm">
-        <form action="/start_survey" method="post">
+        <form action="/treat_answer" method="post">
         {% csrf_token %}
-        {% for survey in surveys %}           
+        {% for choice in choices %}           
 
             <input type="radio" class="btn-check" name="options-base" id="option{{ loop.index }}" value="{{ loop.index }}" autocomplete="off">
-            <label class="btn" for="option{{ loop.index }}">{{ survey.survey_title }}</label>
+            {% if choice.description %}<p>{{ choice.description }}</p>{% endif %}
+            <label class="btn" for="option{{ loop.index }}">{{ choice.text }}</label>
             
         {% endfor %}
         <button class="btn btn-primary" type="submit">Начать опрос</button>

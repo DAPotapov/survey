@@ -5,7 +5,7 @@ from django.db import models
 
 # Create your models here.
 class Survey(models.Model):
-    survey_title = models.CharField(verbose_name="Название", max_length=100)
+    text = models.CharField(verbose_name="Название", max_length=255)
     description = models.TextField(verbose_name="Описание", blank=True)
 
     class Meta:
@@ -13,12 +13,12 @@ class Survey(models.Model):
         verbose_name_plural = "Опросы"
 
     def __str__(self) -> str:
-        return self.survey_title
+        return self.text
 
 
 class Question(models.Model):
-    question_text = models.CharField(verbose_name="Вопрос", max_length=255)
-    specifics = models.TextField(verbose_name="Подробности вопроса", blank=True)
+    text = models.CharField(verbose_name="Вопрос", max_length=255)
+    description = models.TextField(verbose_name="Подробности вопроса", blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
@@ -27,11 +27,11 @@ class Question(models.Model):
         verbose_name_plural = "Вопросы"
 
     def __str__(self) -> str:
-        return self.question_text
+        return self.text
 
 
 class Choice(models.Model):
-    choice_text = models.CharField(verbose_name="Вариант ответа", max_length=255)
+    text = models.CharField(verbose_name="Вариант ответа", max_length=255)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
     # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     next_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, related_name="lead_choices", default=None, null=True)
@@ -41,7 +41,7 @@ class Choice(models.Model):
         verbose_name_plural = "Варианты ответов"
 
     def __str__(self) -> str:
-        return self.choice_text
+        return self.text
 
 
 class UsersActivity(models.Model):
