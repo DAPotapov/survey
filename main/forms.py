@@ -5,4 +5,4 @@ from django.forms import ModelForm
 class SurveyForm(ModelForm):
     class Meta:
         model = Survey
-        fields = ["survey_title", "description"]
+        fields = ["text", "description"]

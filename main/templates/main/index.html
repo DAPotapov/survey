@@ -7,14 +7,16 @@
 {% block main %}
     <h1>{{ header }}</h1>
     {% if choices %}
-    <div class="container-sm">
-        <form action="/treat_answer" method="post">
+    <div class="mb-3">
+        <form action="/survey" class="form-group" method="post">
         {% csrf_token %}
         {% for choice in choices %}           
 
             <input type="radio" class="btn-check" name="options-base" id="option{{ loop.index }}" value="{{ loop.index }}" autocomplete="off">
-            {% if choice.description %}<p>{{ choice.description }}</p>{% endif %}
-            <label class="btn" for="option{{ loop.index }}">{{ choice.text }}</label>
+            <label class="btn d-block" for="option{{ loop.index }}">
+                {{ choice.text }} 
+                {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
+            </label>
             
         {% endfor %}
         <button class="btn btn-primary" type="submit">Начать опрос</button>
