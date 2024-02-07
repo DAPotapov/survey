@@ -1,0 +1,33 @@
+{% extends "main/layout.html" %}
+
+{% block title %}
+    Пройдите опрос
+{% endblock %}
+
+{% block main %}
+    <h2>{{ header }}</h2>
+    <!-- <h3>{{ header.description }}</h3> -->
+    {% if choices %}
+    <div class="mb-3">
+        {% if question %}
+            <h3>{{ question.text }}</h3>
+            {% if question.description %}<h4>{{ question.description }}</h4>{% endif %}
+        {% endif %}
+
+        <form action="/questions" class="form-group" method="post">
+        {% csrf_token %}
+        {% for choice in choices %}           
+
+            <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.next_question }}" autocomplete="off">
+            <label class="btn d-block" for="option{{ forloop.counter }}">
+                {{ choice.text }} 
+                {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
+            </label>
+            
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Ответить</button>
+        </form>
+    </div>
+    {% endif %}  
+
+{% endblock %}

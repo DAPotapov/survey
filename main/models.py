@@ -20,6 +20,9 @@ class Question(models.Model):
     text = models.CharField(verbose_name="Вопрос", max_length=255)
     description = models.TextField(verbose_name="Подробности вопроса", blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    # TODO Нужно для определения первого вопроса. Ещё для чего?
+    # Лучше заменить булевым полем и сделать функцию проверки, что 1 вопрос - один
+    # Сейчас дублирует иерархию, определяемую вариантами ответов и может противоречить ей
     parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
