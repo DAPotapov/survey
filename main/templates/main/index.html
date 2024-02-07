@@ -12,8 +12,8 @@
         {% csrf_token %}
         {% for choice in choices %}           
 
-            <input type="radio" class="btn-check" name="options-base" id="option{{ loop.index }}" value="{{ loop.index }}" autocomplete="off">
-            <label class="btn d-block" for="option{{ loop.index }}">
+            <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.id }}" autocomplete="off">
+            <label class="btn d-block" for="option{{ forloop.counter }}">
                 {{ choice.text }} 
                 {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
             </label>

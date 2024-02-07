@@ -8,6 +8,8 @@ def index(request):
     # В задании указано требование "Без использования ORM" только перед требованиями к
     # результатам опросов. Следовательно, в остальных местах допускается использование ORM.
     surveys = Survey.objects.all()
+    print(surveys)
+    print(request)
     content = {
         'header': "Доступные опросы",
         'choices': surveys
@@ -16,11 +18,22 @@ def index(request):
 
 
 def treat_answer(request):
+    print(request)
     error = ''
     if request.method == "POST":
-        form = SurveyForm(request.POST)
-        if form.is_valid():
-            form.save()  # ????
+        survey = request.POST.get("choice")
+        if survey:
+            print(survey) # тут должно быть id - ДА
+            
+
+        # Теперь берем вопрос из БД и показываем варианты ответа, 
+        # id заготавливаем для отдельного пользователя - храним в сессии - потом добавить
+        # views должны быть разными, т.к. с формы survey получаю только id опроса
+        # а с формы ответа на вопрос выбранный ответ - другая таблица!
+        # городить длинный урл мне не надо, нужные данные я легко получу из choice.
+        # form = SurveyForm(request.POST)
+        # if form.is_valid():
+        #     form.save()  # ????
             # TODO: в хедер помещаем название опроса
             # разбираем форму/реквест и 
             # в зависимости от содержимого выбираем из БД вопрос и варианты ответов.

@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv # TODO uncomment on production!!!!
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,8 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-load_dotenv()
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+# TODO uncomment on production!!!!
+# load_dotenv() 
+# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY ="django-insecure-)u4^wd1ugfhj977f+q8n47^g_+q20pfn2hz(ogvm6wk3fiyqpn" # TODO replace on production!!!!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,8 +88,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "survey",
-        "USER": USER,
-        "PASSWORD": PASSWORD,
+        # "USER": USER,
+        # "PASSWORD": PASSWORD,
+        "USER": 'postgres', # TODO replace on production!!!!
+        "PASSWORD": 'postgres', # TODO replace on production!!!!
         "HOST": "localhost",
         "PORT": "5432",
     }
