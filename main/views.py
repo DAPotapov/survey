@@ -12,7 +12,7 @@ def index(request):
     print(request)
     content = {
         'header': "Доступные опросы",
-        'choices': surveys
+        'surveys': surveys
     }
     return render(request, 'main/index.html', content)
 
@@ -21,7 +21,7 @@ def treat_answer(request):
     print(request)
     error = ''
     if request.method == "POST":
-        survey = request.POST.get("choice")
+        survey = request.POST.get("survey")
         if survey:
             print(survey) # тут должно быть id - ДА
             

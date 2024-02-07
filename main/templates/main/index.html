@@ -6,16 +6,16 @@
 
 {% block main %}
     <h1>{{ header }}</h1>
-    {% if choices %}
+    {% if surveys %}
     <div class="mb-3">
         <form action="/survey" class="form-group" method="post">
         {% csrf_token %}
-        {% for choice in choices %}           
+        {% for survey in surveys %}           
 
-            <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.id }}" autocomplete="off">
+            <input type="radio" class="btn-check" name="survey" id="option{{ forloop.counter }}" value="{{ survey.id }}" autocomplete="off">
             <label class="btn d-block" for="option{{ forloop.counter }}">
-                {{ choice.text }} 
-                {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
+                {{ survey.text }} 
+                {% if survey.description %}<p><sub>{{ survey.description }}</sub></p>{% endif %}
             </label>
             
         {% endfor %}
