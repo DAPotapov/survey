@@ -1,3 +1,4 @@
+from django.db import DataError
 from django.shortcuts import render, redirect
 from .models import Question, Choice, Survey, UsersActivity
 from .forms import SurveyForm
@@ -92,7 +93,7 @@ def treat_answer(request):
             Choice.DoesNotExist,
             Choice.MultipleObjectsReturned):
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
-        except:
+        except DataError:
             err_code = '500'
             error = 'Не удалось записать в базу данных. Попробуйте позже.'
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
