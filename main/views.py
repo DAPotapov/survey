@@ -112,6 +112,9 @@ def treat_answer(request):
 
 
 def get_statistics(survey_id):
-    context = {}
+    respondents_count = 
+    context = {
+        'respondent_count': respondents_count,
+    }
 
     return context

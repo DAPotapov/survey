@@ -1,5 +1,3 @@
-from email.policy import default
-import uuid
 from django.db import models
 
 
@@ -62,4 +60,4 @@ class UsersActivity(models.Model):
 
     def __str__(self) -> str:
         # TODO What should I return here?
-        return str(self.user_id)  # This will not work
+        return str(self.user_id)
