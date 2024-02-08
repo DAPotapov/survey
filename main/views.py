@@ -1,7 +1,7 @@
-from django.db import DataError
+from django.db import DataError, connections
 from django.shortcuts import render, redirect
+
 from .models import Question, Choice, Survey, UsersActivity
-from .forms import SurveyForm
 
 
 # Create your views here.
@@ -112,9 +112,17 @@ def treat_answer(request):
 
 
 def get_statistics(survey_id):
-    respondents_count = 
-    context = {
-        'respondent_count': respondents_count,
-    }
+    db_name = 'default'
+    conn = connections[db_name]
+    context = {}
+    with conn.cursor() as cursor:
+        
+        query = "SELECT COUNT(*) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
+        cursor.execute(query, [survey_id])
+        respondents_count = cursor.fetchone()[0] # TODO try
+        print("Количество: ", respondents_count, survey_id)
+        context = {
+            'respondent_count': respondents_count,
+        }
 
     return context
