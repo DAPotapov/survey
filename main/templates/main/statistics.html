@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    {% if surveys %}
+    {% if stats %}
     <div class="container">
-        {% for survey in surveys %}
-        <h3>Результаты опроса {{ survey }}:</h3>
-        <p>Респондентов приняло участие: {{ survey.count_respondents }}</p>
-
+        {% for survey in stats %}
+        <h3>Результаты опроса {{ survey.title }}:</h3>
+        <p>Респондентов приняло участие: {{ survey.respondent_count }}</p>
+        {% endfor %}
     </div>
     {% else %}
 

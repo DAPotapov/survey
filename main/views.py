@@ -84,10 +84,12 @@ def treat_answer(request):
             # Если ответ никуда не ведёт, значит опрос закончен и пора показывать результаты
             if not choice.next_question:
                 try:
-                    context = get_statistics(request.session.get('survey', '')['id'])
+                    context = get_results(request.session.get('survey', '')['id'])
+                    context['survey'] = survey
                 except (AttributeError, ValueError):
                     return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
                 else:
+                    print(context)
                     return render(request, 'main/results.html', context=context)
             
             # Готовим следующий вопрос и варианты ответа на
@@ -111,18 +113,36 @@ def treat_answer(request):
         return redirect("/")
 
 
-def get_statistics(survey_id):
+def get_results(survey_id):
     db_name = 'default'
     conn = connections[db_name]
     context = {}
     with conn.cursor() as cursor:
         
-        query = "SELECT COUNT(*) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
+        query = "SELECT COUNT(DISTINCT user_id) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
         cursor.execute(query, [survey_id])
-        respondents_count = cursor.fetchone()[0] # TODO try
-        print("Количество: ", respondents_count, survey_id)
+        respondent_count = cursor.fetchone()[0] # TODO try
+        print("Количество: ", respondent_count, survey_id)
         context = {
-            'respondent_count': respondents_count,
+            'respondent_count': respondent_count,
         }
 
     return context
+
+
+def statistics(request):
+    
+    surveys_count = Survey.objects.count()
+    if not surveys_count:
+        return render(request, 'main/error.html', {'err_code': '404', 'error': "Надо же... ни одного опроса нет ещё..."})
+    stats = []
+    surveys = Survey.objects.all()
+    for survey in surveys:
+        survey_stats = get_results(survey.id)
+        survey_stats['title'] = survey.text
+        stats.append(survey_stats)
+    context = {
+        'stats': stats
+    }
+    print(context)
+    return render(request, 'main/statistics.html', context=context)

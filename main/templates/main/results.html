@@ -5,24 +5,18 @@
 {% endblock %}
 
 {% block main %}
-    {% if survey and questions and choices %}
-    <h3>Результаты опроса {{ survey }}:</h3>
+    {% if survey and respondent_count %}
+    <h3>Результаты опроса '{{ survey.text }}'</h3>
     <div class="container">
-        <p>Респондентов приняло участие: {{ count_respondents }}</p>
+        <p>Респондентов приняло участие: {{ respondent_count  }}</p>
         <div>
             {% for question in questions %}
             <p>Вопрос: "{{ question.text }}"</p>
-
             {% endfor %}
         </div>
     </div>
     {% else %}
-
-    <h3>Ошибка при получении данных с сервера</h3>
-
+        <h3>Ошибка при получении данных с сервера</h3>
     {% endif %}
-
-
- 
 
 {% endblock %}
