@@ -36,6 +36,8 @@ class Question(models.Model):
 class Choice(models.Model):
     text = models.CharField(verbose_name="Вариант ответа", max_length=255)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
+    # Здесь умышленно иду по пути нормализации БД в ущерб производительности,
+    # Исходя из принципа "простое - лучше сложного"
     # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     next_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, related_name="lead_choices", default=None, null=True)
 
@@ -60,4 +62,4 @@ class UsersActivity(models.Model):
 
     def __str__(self) -> str:
         # TODO What should I return here?
-        return self.user.name  # This will not work
+        return str(self.user_id)  # This will not work
