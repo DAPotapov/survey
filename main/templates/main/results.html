@@ -1,0 +1,28 @@
+{% extends "main/layout.html" %}
+
+{% block title %}
+    Результаты опроса
+{% endblock %}
+
+{% block main %}
+    {% if survey and questions and choices %}
+    <h3>Результаты опроса {{ survey }}:</h3>
+    <div class="container">
+        <p>Респондентов приняло участие: {{ count_respondents }}</p>
+        <div>
+            {% for question in questions %}
+            <p>Вопрос: "{{ question.text }}"</p>
+            
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+
+    <h3>Ошибка при создании страницы</h3>
+
+    {% endif %}
+
+
+ 
+
+{% endblock %}
