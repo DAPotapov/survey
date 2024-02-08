@@ -61,26 +61,32 @@ def treat_survey(request):
 
 def treat_answer(request):
     if request.method == "POST":
-        # Получаем id следующего вопроса из формы
-        next_question_id = request.POST.get("choice")
+        # TODO можно получить и вопрос и вариант сразу и разобрать здесь splitом
+        question_id, choosen_id = request.POST.get("choice").split('_') # Его и запишем в БД
+        print("choice from form:", choosen_id, type(choosen_id))
+        next_question_id = choosen.next_question
         # TODO добавляем проверку на наличие вопроса и переход на страницу результатов
         # TODO записываем полученный результат! После введения сессии и id респондента
         err_code = '404'
         print("next_question_id: ", next_question_id)  # тут должно быть id 
         try:
             question = Question.objects.get(pk=next_question_id)
-            choices = Choice.objects.filter(question__id=next_question_id)
-        except:
+        except (Question.DoesNotExist, Question.MultipleObjectsReturned):
             error = "Упс! Что-то пошло не так..."
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
-        else:        
-            survey = 'пока хардкод'
-            context = {
-                'header': survey,
-                'question': question,
-                'choices': choices
-                }
-            return render(request, 'main/questions.html', context)
+        else:
+            choices = Choice.objects.filter(question__id=next_question_id)
+            if choices.exists():
+                survey = 'пока хардкод'
+                context = {
+                    'header': survey,
+                    'question': question,
+                    'choices': choices
+                    }
+                return render(request, 'main/questions.html', context)
+            else:
+                error = "Упс! Что-то пошло не так..."
+                return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
 
 
     else:
