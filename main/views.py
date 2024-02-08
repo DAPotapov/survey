@@ -61,21 +61,27 @@ def treat_survey(request):
 
 def treat_answer(request):
     if request.method == "POST":
-        # TODO можно получить и вопрос и вариант сразу и разобрать здесь splitом
         question_id, choosen_id = request.POST.get("choice").split('_') # Его и запишем в БД
         print("choice from form:", choosen_id, type(choosen_id))
-        next_question_id = choosen.next_question
-        # TODO добавляем проверку на наличие вопроса и переход на страницу результатов
+        next_question = Choice.objects.get(pk=choosen_id).next_question
         # TODO записываем полученный результат! После введения сессии и id респондента
+
+        # Если ответ никуда не ведёт, значит опрос закончен и пора показывать результаты
+        if not next_question:
+            # TODO переходим к результатам
+            context = get_statistics(1)
+            return render(request, 'main/results.html', context=context)
         err_code = '404'
-        print("next_question_id: ", next_question_id)  # тут должно быть id 
+        print("next_question_id: ", next_question, type(next_question), next_question.id)  # тут должно быть id 
         try:
-            question = Question.objects.get(pk=next_question_id)
+            question = Question.objects.get(pk=next_question.id)
+            print("question_id: ", question, type(question), question.id)
         except (Question.DoesNotExist, Question.MultipleObjectsReturned):
             error = "Упс! Что-то пошло не так..."
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:
-            choices = Choice.objects.filter(question__id=next_question_id)
+            print("Они одинаковые?", question is next_question)
+            choices = Choice.objects.filter(question__id=next_question.id)
             if choices.exists():
                 survey = 'пока хардкод'
                 context = {
@@ -87,7 +93,10 @@ def treat_answer(request):
             else:
                 error = "Упс! Что-то пошло не так..."
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
-
-
     else:
         return redirect("/")
+
+
+def get_statistics(survey_id):
+    context = {}
+    return context
