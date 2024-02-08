@@ -1,0 +1,24 @@
+{% extends "main/layout.html" %}
+
+{% block title %}
+    Результаты опроcов
+{% endblock %}
+
+{% block main %}
+    {% if surveys %}
+    <div class="container">
+        {% for survey in surveys %}
+        <h3>Результаты опроса {{ survey }}:</h3>
+        <p>Респондентов приняло участие: {{ survey.count_respondents }}</p>
+
+    </div>
+    {% else %}
+
+    <h3>Ошибка при получении данных с сервера</h3>
+
+    {% endif %}
+
+
+ 
+
+{% endblock %}
