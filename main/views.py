@@ -22,22 +22,26 @@ def treat_survey(request):
     if request.method == "POST":
         survey = request.POST.get("survey")
         err_code = '404'
+        error = "Упс! Что-то пошло не так..."
         print(survey)  # тут должно быть id - ДА
         try:
             question = Question.objects.get(survey__id=survey, parent_question__isnull=True)
             print(question)
-            choices = Choice.objects.filter(question__id=question.id)
-            print(choices)
-        except:
-            error = "Упс! Что-то пошло не так..."
+        except (Question.DoesNotExist, Question.MultipleObjectsReturned):
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:        
-            context = {
-                'header': "Опрос: " + survey,
-                'question': question,
-                'choices': choices
-                }
-            return render(request, 'main/questions.html', context)
+            choices = Choice.objects.filter(question__id=question.id)
+            if choices.exists():
+                print(choices)
+                context = {
+                    'header': "Опрос: " + survey,
+                    'question': question,
+                    'choices': choices
+                    }
+                return render(request, 'main/questions.html', context)
+            else:
+                return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+
 
 
         # id заготавливаем для отдельного пользователя - храним в сессии - потом добавить
@@ -69,12 +73,12 @@ def treat_answer(request):
             return render(request, 'main/results.html', context=context)
         
         err_code = '404'
+        error = "Упс! Что-то пошло не так..."
         print("next_question_id: ", next_question, type(next_question), next_question.id)  # тут должно быть id 
         try:
             question = Question.objects.get(pk=next_question.id)
             print("question_id: ", question, type(question), question.id)
         except (Question.DoesNotExist, Question.MultipleObjectsReturned):
-            error = "Упс! Что-то пошло не так..."
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:
             print("Они одинаковые?", question is next_question)
@@ -88,7 +92,6 @@ def treat_answer(request):
                     }
                 return render(request, 'main/questions.html', context)
             else:
-                error = "Упс! Что-то пошло не так..."
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
     else:
         return redirect("/")
