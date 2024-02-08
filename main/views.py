@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Question, Choice, Survey
+from .models import Question, Choice, Survey, UsersActivity
 from .forms import SurveyForm
 
 
@@ -8,8 +8,10 @@ def index(request):
     # В задании указано требование "Без использования ORM" только перед требованиями к
     # результатам опросов. Следовательно, в остальных местах допускается использование ORM.
     surveys = Survey.objects.all()
-    print(type(request.session.session_key))
-    # print(dir(request.session))
+
+    # Каждый запрос на главную страницу создаёт новую сессию
+    request.session.create()    
+    print(request.session.session_key)
     content = {
         'header': "Доступные опросы",
         'surveys': surveys
@@ -70,42 +72,65 @@ def treat_answer(request):
         err_code = '404'
         error = "Упс! Что-то пошло не так..."
 
-        question_id, choosen_id = request.POST.get("choice").split('_') # Его и запишем в БД
-        print("choice from form:", question_id, choosen_id)
-        next_question = Choice.objects.get(pk=choosen_id).next_question
-        # TODO записываем полученный результат! После введения сессии и id респондента
+        survey = request.session.get('survey', '')
+        # Получаем информацию о вопросе и ответе на него из формы
+        question_id, choosen_id = request.POST.get("choice").split('_')
 
-        # Если ответ никуда не ведёт, значит опрос закончен и пора показывать результаты
-        if not next_question:
-            try:
-                context = get_statistics(request.session.get('survey', '')['id'])
-            except (AttributeError, ValueError):
-                return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
-            else:
-                return render(request, 'main/results.html', context=context)
-        
-        print("next_question_id: ", next_question, type(next_question), next_question.id)  # тут должно быть id 
+        # Записываем полученную информацию в БД
         try:
-            question = Question.objects.get(pk=next_question.id)
-            print("question_id: ", question, type(question), question.id)
-        except (Question.DoesNotExist, Question.MultipleObjectsReturned):
+            question = Question.objects.get(pk=question_id)
+            choice = Choice.objects.get(pk=choosen_id)
+            answer = UsersActivity(
+                user_id=request.session.session_key,
+                question=question,
+                choice=choice
+                )
+            answer.save()
+        except (
+            Question.DoesNotExist,
+            Question.MultipleObjectsReturned,
+            Choice.DoesNotExist,
+            Choice.MultipleObjectsReturned):
+            return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+        except:
+            err_code = '500'
+            error = 'Не удалось записать в базу данных. Попробуйте позже.'
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:
-            print("Они одинаковые?", question == next_question)
-            choices = Choice.objects.filter(question__id=next_question.id)
-            if choices.exists():
-                context = {
-                    'header': request.session.get('survey', ''),
-                    'question': question,
-                    'choices': choices
-                    }
-                return render(request, 'main/questions.html', context)
-            else:
+
+            # Если ответ никуда не ведёт, значит опрос закончен и пора показывать результаты
+            if not choice.next_question:
+                try:
+                    context = get_statistics(request.session.get('survey', '')['id'])
+                except (AttributeError, ValueError):
+                    return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+                else:
+                    return render(request, 'main/results.html', context=context)
+            
+            # Готовим следующий вопрос и варианты ответа на
+            try:
+                # question = Question.objects.get(pk=next_question.id)
+                question = choice.next_question
+            except (Question.DoesNotExist, Question.MultipleObjectsReturned):
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+            else:
+                # choices = Choice.objects.filter(question__id=next_question.id)
+                choices = question.choices.all()
+                if choices.exists():
+                    context = {
+                        'header': survey,
+                        'question': question,
+                        'choices': choices
+                        }
+                    return render(request, 'main/questions.html', context)
+                else:
+                    return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+                
     else:
         return redirect("/")
 
 
 def get_statistics(survey_id):
     context = {}
+
     return context
