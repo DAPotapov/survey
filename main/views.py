@@ -21,7 +21,6 @@ def index(request):
 
 
 def treat_survey(request):
-    print(request)
     if request.method == "POST":
         survey_id = request.POST.get("survey")
         survey = Survey.objects.get(pk=survey_id)
@@ -34,13 +33,11 @@ def treat_survey(request):
         error = "Упс! Что-то пошло не так..."
         try:
             question = Question.objects.get(survey__id=survey_id, parent_question__isnull=True)
-            print(question)
         except (Question.DoesNotExist, Question.MultipleObjectsReturned):
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:        
             choices = Choice.objects.filter(question__id=question.id)
             if choices.exists():
-                print(choices)
                 context = {
                     'header': "Опрос: " + survey_id,
                     'question': question,
@@ -49,21 +46,6 @@ def treat_survey(request):
                 return render(request, 'main/questions.html', context)
             else:
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
-
-
-
-        # id заготавливаем для отдельного пользователя - храним в сессии - потом добавить
-        # survey тоже лучше хранить в сессии, чтоб снизить нагрузку на БД
-        # views должны быть разными, т.к. с формы survey получаю только id опроса
- 
-            # TODO: в хедер помещаем название опроса
-            # разбираем форму/реквест и 
-            # в зависимости от содержимого выбираем из БД вопрос и варианты ответов.
-            # полученные данные записываем в юзерактивити
-
-            # потом оптимизировать, т.к. эта процедура будет повторяться
-
-
     else:
         return redirect("/")
 
@@ -110,12 +92,10 @@ def treat_answer(request):
             
             # Готовим следующий вопрос и варианты ответа на
             try:
-                # question = Question.objects.get(pk=next_question.id)
                 question = choice.next_question
             except (Question.DoesNotExist, Question.MultipleObjectsReturned):
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
             else:
-                # choices = Choice.objects.filter(question__id=next_question.id)
                 choices = question.choices.all()
                 if choices.exists():
                     context = {
