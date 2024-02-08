@@ -33,7 +33,7 @@ def treat_survey(request):
             return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
         else:        
             context = {
-                'header': survey,
+                'header': "Опрос: " + survey,
                 'question': question,
                 'choices': choices
                 }
@@ -46,9 +46,6 @@ def treat_survey(request):
         # views должны быть разными, т.к. с формы survey получаю только id опроса
         # а с формы ответа на вопрос выбранный ответ - другая таблица!
         # городить длинный урл мне не надо, нужные данные я легко получу из choice.
-        # form = SurveyForm(request.POST)
-        # if form.is_valid():
-        #     form.save()  # ????
             # TODO: в хедер помещаем название опроса
             # разбираем форму/реквест и 
             # в зависимости от содержимого выбираем из БД вопрос и варианты ответов.
@@ -60,13 +57,16 @@ def treat_survey(request):
 
     else:
         return redirect("/")
-    
+
+
 def treat_answer(request):
     if request.method == "POST":
         # Получаем id следующего вопроса из формы
         next_question_id = request.POST.get("choice")
+        # TODO добавляем проверку на наличие вопроса и переход на страницу результатов
+        # TODO записываем полученный результат! После введения сессии и id респондента
         err_code = '404'
-        print(next_question_id)  # тут должно быть id - ДА
+        print("next_question_id: ", next_question_id)  # тут должно быть id 
         try:
             question = Question.objects.get(pk=next_question_id)
             choices = Choice.objects.filter(question__id=next_question_id)
