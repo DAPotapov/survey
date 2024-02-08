@@ -5,14 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    <h2>{{ header }}</h2>
-    <!-- <h3>{{ header.description }}</h3> -->
-    {% if choices %}
+{% if header and question and choices %}
+    <h2>{{ header.text }}</h2>
+    <h3>{{ header.description }}</h3>
     <div class="mb-3">
-        {% if question %}
             <h3>{{ question.text }}</h3>
             {% if question.description %}<h4>{{ question.description }}</h4>{% endif %}
-        {% endif %}
 
         <form action="/questions" class="form-group" method="post">
         {% csrf_token %}
@@ -28,6 +26,7 @@
         <button class="btn btn-primary" type="submit">Ответить</button>
         </form>
     </div>
-    {% endif %}  
-
+{% else %}
+    <h3>Ошибка при получении данных с сервера</h3>
+{% endif %}
 {% endblock %}

@@ -50,7 +50,7 @@ class Choice(models.Model):
 
 
 class UsersActivity(models.Model):
-    user_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=40)
     # Do I need survey here? Because it already linked with question
     # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)

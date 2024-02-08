@@ -12,13 +12,13 @@
         <div>
             {% for question in questions %}
             <p>Вопрос: "{{ question.text }}"</p>
-            
+
             {% endfor %}
         </div>
     </div>
     {% else %}
 
-    <h3>Ошибка при создании страницы</h3>
+    <h3>Ошибка при получении данных с сервера</h3>
 
     {% endif %}
 
