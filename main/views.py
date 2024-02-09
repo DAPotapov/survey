@@ -151,6 +151,9 @@ def get_results(survey_id):
             """
         cursor.execute(query, [survey_id])
         questions = cursor.fetchall()
+        query = """
+        SELECT
+"""
         context = {
             'respondent_count': respondent_count,
             'questions': questions
