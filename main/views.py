@@ -119,12 +119,41 @@ def get_results(survey_id):
     context = {}
     with conn.cursor() as cursor:
         
+        # Количество участников опроса
         query = "SELECT COUNT(DISTINCT user_id) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
         cursor.execute(query, [survey_id])
         respondent_count = cursor.fetchone()[0]
         print("Количество: ", respondent_count, survey_id)
+
+        # Количество ответивших на каждый вопрос и их доля от общего числа респондентов опроса
+        query = """
+            WITH ranked_users_activity AS (
+            SELECT
+                question_id,
+                COUNT(*) AS record_count,
+                DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) AS position
+            FROM
+                main_usersactivity
+            WHERE question_id in (
+                SELECT id FROM main_question WHERE survey_id = %s)
+            GROUP BY
+                question_id
+            )
+            SELECT
+                question_id,
+                main_question.text,
+                record_count,
+                position
+            FROM
+                ranked_users_activity
+            JOIN
+                main_question ON question_id = main_question.id
+            """
+        cursor.execute(query, [survey_id])
+        questions = cursor.fetchall()
         context = {
             'respondent_count': respondent_count,
+            'questions': questions
         }
 
     return context
