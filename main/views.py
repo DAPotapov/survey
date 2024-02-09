@@ -86,12 +86,12 @@ def treat_answer(request):
                 try:
                     context = get_results(request.session.get('survey', '')['id'])
                     context['survey'] = survey
-                except (AttributeError, ValueError):
+                except (AttributeError, ValueError, IndexError, TypeError):
                     return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
                 else:
                     print(context)
                     return render(request, 'main/results.html', context=context)
-            
+
             # Готовим следующий вопрос и варианты ответа на
             try:
                 question = choice.next_question
@@ -121,7 +121,7 @@ def get_results(survey_id):
         
         query = "SELECT COUNT(DISTINCT user_id) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
         cursor.execute(query, [survey_id])
-        respondent_count = cursor.fetchone()[0] # TODO try
+        respondent_count = cursor.fetchone()[0]
         print("Количество: ", respondent_count, survey_id)
         context = {
             'respondent_count': respondent_count,
@@ -138,7 +138,10 @@ def statistics(request):
     stats = []
     surveys = Survey.objects.all()
     for survey in surveys:
-        survey_stats = get_results(survey.id)
+        try:
+            survey_stats = get_results(survey.id)
+        except (IndexError, TypeError):
+            return render(request, 'main/error.html', {'err_code': '404', 'error': "Не удалось получить результаты опроса"})
         survey_stats['title'] = survey.text
         stats.append(survey_stats)
     context = {
