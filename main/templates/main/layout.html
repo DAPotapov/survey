@@ -10,30 +10,26 @@
 <body>
 
 
-  <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 link-body-emphasis text-decoration-none">
-        <span class="fs-4">Опросник</span>
-      </a>
-      <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/stats">Статистика</a>
+  <nav class="bg-light border navbar navbar-expand-md navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/"><span class="fs-4">Опросник</span></a>
+        <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav me-auto mt-2">
+                <li class="nav-item"><a class="nav-link" href="/stats">Статистика</a></li>
+            </ul>
         </div>
-      </nav>
-      
-    </header>
-    
-    
-  
+      </div>  
+  </nav>
+
   <main class="container-fluid py-3 text-center">
     {% block main %}{% endblock %}
   </main>
-    
-   
-
 
   <div class="container border-top">
       <footer class="py-3 my-4 ">
-
         <p class="text-center text-body-secondary">© 2024 Potapov D.A.</p>
       </footer>
   </div>
