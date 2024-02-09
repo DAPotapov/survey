@@ -56,9 +56,13 @@ def treat_answer(request):
         error = "Упс! Что-то пошло не так..."
 
         survey = request.session.get('survey', '')
-        # Получаем информацию о вопросе и ответе на него из формы
-        question_id, choosen_id = request.POST.get("choice").split('_')
 
+        # Получаем информацию о вопросе и ответе на него из формы
+        try:
+            question_id, choosen_id = request.POST.get("choice").split('_')
+        except AttributeError:
+            return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+        
         # Записываем полученную информацию в БД
         try:
             question = Question.objects.get(pk=question_id)
@@ -89,7 +93,7 @@ def treat_answer(request):
                 except (AttributeError, ValueError, IndexError, TypeError):
                     return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
                 else:
-                    return render(request, 'main/results.html', context=context)
+                    return render(request, 'main/statistics.html', context=context)
 
             # Готовим следующий вопрос и варианты ответа на
             try:
@@ -204,7 +208,7 @@ def get_results(survey_id):
 
 
 def statistics(request):
-    
+
     surveys_count = Survey.objects.count()
     if not surveys_count:
         return render(request, 'main/error.html', {'err_code': '404', 'error': "Надо же... ни одного опроса нет ещё..."})
