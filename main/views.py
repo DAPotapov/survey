@@ -10,9 +10,8 @@ def index(request):
     # результатам опросов. Следовательно, в остальных местах допускается использование ORM.
     surveys = Survey.objects.all()
 
-    # Каждый запрос на главную страницу создаёт новую сессию
+    # Каждый запрос на главную страницу создаёт новую сессию, удобно для заполнения таблицы с результатами
     request.session.create()    
-    print(request.session.session_key)
     content = {
         'header': "Доступные опросы",
         'surveys': surveys
@@ -87,15 +86,20 @@ def treat_answer(request):
 
             # Если ответ никуда не ведёт, значит опрос закончен и пора показывать результаты
             if not choice.next_question:
+                stats = []
                 try:
-                    context = get_results(request.session.get('survey', '')['id'])
-                    context['survey'] = survey
+                    survey_results = get_results(request.session.get('survey', '')['id'])
+                    survey_results['title'] = survey['text']
                 except (AttributeError, ValueError, IndexError, TypeError):
                     return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
                 else:
+                    stats.append(survey_results)
+                    context = {
+                        'stats': stats
+                    }
                     return render(request, 'main/statistics.html', context=context)
 
-            # Готовим следующий вопрос и варианты ответа на
+            # Готовим следующий вопрос и варианты ответа на него
             try:
                 question = choice.next_question
             except (Question.DoesNotExist, Question.MultipleObjectsReturned):
@@ -119,7 +123,7 @@ def treat_answer(request):
 def get_results(survey_id):
     db_name = 'default'
     conn = connections[db_name]
-    context = {}
+    survey_stats = {}
     with conn.cursor() as cursor:
         
         # Количество участников опроса
@@ -195,16 +199,15 @@ def get_results(survey_id):
                     q_choices.append(choice_dict)
             question['choices'] = q_choices
             question['rate'] = question['record_count'] / respondent_count * 100  # процент
-            print(question)
             new_questions.append(question)
 
         # Соберём словарь для передачи в шаблон
-        context = {
+        survey_stats = {
             'respondent_count': respondent_count,
             'questions': new_questions
         }
 
-    return context
+    return survey_stats
 
 
 def statistics(request):

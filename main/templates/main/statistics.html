@@ -9,7 +9,7 @@
     <div class="container">
         {% for survey in stats %}
         <div class="container gy-5">
-            <h3">Результаты опроса {{ survey.title }}:</h3>
+            <h3>Результаты опроса "{{ survey.title }}"</h3>
             <p>Респондентов приняло участие: {{ survey.respondent_count }}</p>
             {% if survey.questions %}
             <div class="container text-center table">
@@ -18,7 +18,7 @@
                     Рейтинг
                   </div>
                   <div class="col">
-                    Вопрос
+                    Вопрос / варианты ответов
                   </div>
                   <div class="col">
                     Количество полученных ответов
