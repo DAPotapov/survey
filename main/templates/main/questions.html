@@ -6,25 +6,33 @@
 
 {% block main %}
 {% if header and question and choices %}
-    <h3>{{ header.text }}</h3>
-    <h4>{{ header.description }}</h4>
-    <div class="mb-3">
+    <div class="container">
+        <h3>{{ header.text }}</h3>
+        <h4>{{ header.description }}</h4>
+    </div>
+    <div class="container">
+        <div class="container">
             <h5>{{ question.text }}</h5>
             {% if question.description %}<h6>{{ question.description }}</h6>{% endif %}
-
-        <form action="/questions" class="form-group" method="post">
-        {% csrf_token %}
-        
-        {% for choice in choices %}           
-            <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.question.id }}_{{ choice.id }}" autocomplete="off">
-            <label class="btn d-block" for="option{{ forloop.counter }}">
-                {{ choice.text }} 
-                {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
-            </label>
+        </div>
+        <div class="container">
+            <form action="/questions" class="form-group" method="post">
+            {% csrf_token %}
             
-        {% endfor %}
-        <button class="btn btn-primary" type="submit">Ответить</button>
-        </form>
+            {% for choice in choices %}
+            <div class="container row justify-content-md-center gy-5">
+                <div class="col-4">           
+                    <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.question.id }}_{{ choice.id }}" autocomplete="off">
+                    <label class="btn d-block" for="option{{ forloop.counter }}">
+                        {{ choice.text }} 
+                        {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
+                    </label>
+                </div>
+            </div>    
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Ответить</button>
+            </form>
+        </div>
     </div>
 {% else %}
     <h3>Ошибка при получении данных с сервера</h3>

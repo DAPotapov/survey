@@ -9,16 +9,19 @@
         <h3>{{ header}}</h3>
     </div>
     {% if surveys %}
-    <div class="mb-3">
+    <div class="container">
         <form action="/survey" class="form-group" method="post">
         {% csrf_token %}
         {% for survey in surveys %}           
-
-            <input type="radio" class="btn-check" name="survey" id="option{{ forloop.counter }}" value="{{ survey.id }}" autocomplete="off">
-            <label class="btn d-block" for="option{{ forloop.counter }}">
-                {{ survey.text }} 
-                {% if survey.description %}<p><sub>{{ survey.description }}</sub></p>{% endif %}
-            </label>
+            <div class="container row justify-content-md-center gy-5">
+                <div class="col-4">
+                <input type="radio" class="btn btn-check" name="survey" id="option{{ forloop.counter }}" value="{{ survey.id }}" autocomplete="off">
+                <label class="btn d-block" for="option{{ forloop.counter }}">
+                    {{ survey.text }} 
+                    {% if survey.description %}<p><sub>{{ survey.description }}</sub></p>{% endif %}
+                </label>
+                </div>
+            </div>
             
         {% endfor %}
         <button class="btn btn-primary" type="submit">Начать опрос</button>
