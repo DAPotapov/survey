@@ -1,5 +1,4 @@
 {% extends "main/layout.html" %}
-{% load mathfilters %}
 
 {% block title %}
     Результаты опроcов
@@ -9,8 +8,8 @@
     {% if stats %}
     <div class="container">
         {% for survey in stats %}
-        <div class="container">
-            <h3>Результаты опроса {{ survey.title }}:</h3>
+        <div class="container gy-5">
+            <h3">Результаты опроса {{ survey.title }}:</h3>
             <p>Респондентов приняло участие: {{ survey.respondent_count }}</p>
             {% if survey.questions %}
             <div class="container text-center table">
@@ -30,10 +29,18 @@
                 </div>
                 {% for question in survey.questions %}
                 <div class="row">
-                    <div class="col">{{ question.3 }}</div>
-                    <div class="col">{{ question.1 }}</div>
-                    <div class="col">{{ question.2 }}</div>
-                    <div class="col">{{ question.2|div:survey.respondent_count|mul:100 }}%</div>
+                    <div class="col">{{ question.position }}</div>
+                    <div class="col">{{ question.text }}</div>
+                    <div class="col">{{ question.record_count }}</div>
+                    <div class="col">{{ question.rate|floatformat:1 }}%</div>
+                    {% for choice in question.choices %}
+                    <div class="row">
+                        <div class="col">&nbsp</div>
+                        <div class="col">{{ choice.text }}</div>
+                        <div class="col">{{ choice.choice_count }}</div>
+                        <div class="col">{{ choice.rate|floatformat:1 }}%</div>
+                    </div>
+                    {% endfor %}
                 </div>
                 {% endfor %}
               </div>               
