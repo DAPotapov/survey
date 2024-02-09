@@ -6,12 +6,13 @@ from .models import Question, Choice, Survey, UsersActivity
 
 # Create your views here.
 def index(request):
+    """ Стартовая страница приложения показывает перечень имеющихся опросов """
     # В задании указано требование "Без использования ORM" только перед требованиями к
     # результатам опросов. Следовательно, в остальных местах допускается использование ORM.
     surveys = Survey.objects.all()
 
     # Каждый запрос на главную страницу создаёт новую сессию, удобно для заполнения таблицы с результатами
-    request.session.create()    
+    # request.session.create()
     content = {
         'header': "Доступные опросы",
         'surveys': surveys
@@ -20,16 +21,29 @@ def index(request):
 
 
 def treat_survey(request):
+    """
+    Функция обрабатывает выбор опроса пользователем
+    и перенаправляет на страницу с вопросами 
+    """
+
     if request.method == "POST":
+        # Заготавливаем данные для сообщения об ошибке
+        err_code = '404'
+        error = "Упс! Что-то пошло не так..."
+
+        # Получаем идентификатор выбранного опроса
         survey_id = request.POST.get("survey")
         survey = Survey.objects.get(pk=survey_id)
+
+        # Запоминаем выбранный опрос в сессии
         request.session['survey'] = {
             'id': survey.id,
             'text': survey.text,
             'description': survey.description
         }
-        err_code = '404'
-        error = "Упс! Что-то пошло не так..."
+
+        # Задаем первый вопрос пользователю с вариантами ответа
+        # или перенаправляем на страницу с ошибкой, если что-то не так
         try:
             question = Question.objects.get(survey__id=survey_id, parent_question__isnull=True)
         except (Question.DoesNotExist, Question.MultipleObjectsReturned):
@@ -45,11 +59,19 @@ def treat_survey(request):
                 return render(request, 'main/questions.html', context)
             else:
                 return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
+            
+    # Отправляем пользователя на главную страницу, если он попытался зайти по прямой ссылке
     else:
         return redirect("/")
 
 
 def treat_answer(request):
+    """ 
+    Функция запоминает ответы пользователя на вопрос и
+    показывает следующий вопрос.
+    После окончания опроса перенаправляет на страницу с результатами
+    """
+
     if request.method == "POST":
         err_code = '404'
         error = "Упс! Что-то пошло не так..."
@@ -121,6 +143,12 @@ def treat_answer(request):
 
 
 def get_results(survey_id):
+    """
+    Функция подготавливает результаты опроса по заданному id.
+    С использование raw-SQL-запросов.
+    """
+
+    # Подключаемся к БД
     db_name = 'default'
     conn = connections[db_name]
     survey_stats = {}
@@ -185,7 +213,7 @@ def get_results(survey_id):
         cursor.execute(query, [survey_id])
         choices = cursor.fetchall()
             
-        # Объединим полученные данные преобразовав в словарь
+        # Объединим полученные данные, преобразовав в словарь
         c_keys = ['text', 'question_id', 'choice_count']
         new_questions = []
         q_keys = ['id', 'text', 'record_count', 'position']
@@ -201,7 +229,7 @@ def get_results(survey_id):
             question['rate'] = question['record_count'] / respondent_count * 100  # процент
             new_questions.append(question)
 
-        # Соберём словарь для передачи в шаблон
+        # Соберём словарь для передачи в вызывающую функции, а затем в шаблон
         survey_stats = {
             'respondent_count': respondent_count,
             'questions': new_questions
@@ -211,12 +239,17 @@ def get_results(survey_id):
 
 
 def statistics(request):
+    """
+    Функция заполняет страницу со статистикой.
+    """
 
     surveys_count = Survey.objects.count()
     if not surveys_count:
         return render(request, 'main/error.html', {'err_code': '404', 'error': "Надо же... ни одного опроса нет ещё..."})
     stats = []
     surveys = Survey.objects.all()
+
+    # Для каждого запроса в БД получаем результаты из соответствующей функции
     for survey in surveys:
         try:
             survey_stats = get_results(survey.id)
