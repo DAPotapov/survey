@@ -151,9 +151,37 @@ def get_results(survey_id):
             """
         cursor.execute(query, [survey_id])
         questions = cursor.fetchall()
+
+        # Получим статистику по сделанным выборам
         query = """
-        SELECT
-"""
+            WITH choosen_stats AS
+                (SELECT 
+                    choice_id, COUNT(*) as choice_count 
+                FROM 
+                    main_usersactivity 
+                WHERE question_id IN (
+                    SELECT id 
+                    FROM 
+                        main_question 
+                    WHERE 
+                        survey_id=1)  
+                    GROUP BY 
+                        choice_id)
+            SELECT 
+                main_choice.text,
+                question_id,
+                choice_count
+            FROM
+                choosen_stats	
+            JOIN 
+                main_choice ON main_choice.id=choice_id;
+        """
+        cursor.execute(query, [survey_id])
+        choices = cursor.fetchall()
+
+        # Объединим полученные данные
+
+        # Соберём словарь для передачи в шаблон
         context = {
             'respondent_count': respondent_count,
             'questions': questions
