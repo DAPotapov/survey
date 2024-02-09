@@ -89,7 +89,6 @@ def treat_answer(request):
                 except (AttributeError, ValueError, IndexError, TypeError):
                     return render(request, 'main/error.html', {'err_code': err_code, 'error': error})
                 else:
-                    print(context)
                     return render(request, 'main/results.html', context=context)
 
             # Готовим следующий вопрос и варианты ответа на
@@ -123,7 +122,6 @@ def get_results(survey_id):
         query = "SELECT COUNT(DISTINCT user_id) FROM main_usersactivity WHERE question_id IN (SELECT id FROM main_question WHERE survey_id=%s)"
         cursor.execute(query, [survey_id])
         respondent_count = cursor.fetchone()[0]
-        print("Количество: ", respondent_count, survey_id)
 
         # Количество ответивших на каждый вопрос и их доля от общего числа респондентов опроса
         query = """
@@ -164,7 +162,7 @@ def get_results(survey_id):
                     FROM 
                         main_question 
                     WHERE 
-                        survey_id=1)  
+                        survey_id=%s)  
                     GROUP BY 
                         choice_id)
             SELECT 
@@ -178,13 +176,25 @@ def get_results(survey_id):
         """
         cursor.execute(query, [survey_id])
         choices = cursor.fetchall()
-
-        # Объединим полученные данные
+            
+        # Объединим полученные данные преобразовав в словарь
+        new_choices = []
+        c_keys = ['text', 'question_id', 'choice_count']
+        for c in choices:
+            choice_dict = dict(zip(c_keys, c))
+            new_choices.append(choice_dict)
+        new_questions = []
+        q_keys = ['id', 'text', 'record_count', 'position']
+        for q in questions:
+            question = dict(zip(q_keys, q))
+            question['choices'] = [c for c in new_choices if c['question_id'] == question['id']]
+            print(question)
+            new_questions.append(question)
 
         # Соберём словарь для передачи в шаблон
         context = {
             'respondent_count': respondent_count,
-            'questions': questions
+            'questions': new_questions
         }
 
     return context
@@ -207,5 +217,4 @@ def statistics(request):
     context = {
         'stats': stats
     }
-    print(context)
     return render(request, 'main/statistics.html', context=context)
