@@ -178,16 +178,19 @@ def get_results(survey_id):
         choices = cursor.fetchall()
             
         # Объединим полученные данные преобразовав в словарь
-        new_choices = []
         c_keys = ['text', 'question_id', 'choice_count']
-        for c in choices:
-            choice_dict = dict(zip(c_keys, c))
-            new_choices.append(choice_dict)
         new_questions = []
         q_keys = ['id', 'text', 'record_count', 'position']
         for q in questions:
             question = dict(zip(q_keys, q))
-            question['choices'] = [c for c in new_choices if c['question_id'] == question['id']]
+            q_choices = []
+            for c in choices:
+                choice_dict = dict(zip(c_keys, c))
+                if choice_dict['question_id'] == question['id']:
+                    choice_dict['rate'] = choice_dict['choice_count'] / question['record_count'] * 100  # процент
+                    q_choices.append(choice_dict)
+            question['choices'] = q_choices
+            question['rate'] = question['record_count'] / respondent_count * 100  # процент
             print(question)
             new_questions.append(question)
 
