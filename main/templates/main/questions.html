@@ -6,11 +6,11 @@
 
 {% block main %}
 {% if header and question and choices %}
-    <h2>{{ header.text }}</h2>
-    <h3>{{ header.description }}</h3>
+    <h3>{{ header.text }}</h3>
+    <h4>{{ header.description }}</h4>
     <div class="mb-3">
-            <h3>{{ question.text }}</h3>
-            {% if question.description %}<h4>{{ question.description }}</h4>{% endif %}
+            <h5>{{ question.text }}</h5>
+            {% if question.description %}<h6>{{ question.description }}</h6>{% endif %}
 
         <form action="/questions" class="form-group" method="post">
         {% csrf_token %}

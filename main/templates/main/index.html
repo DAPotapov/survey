@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block main %}
-    <h2>{{ header}}</h2>
+    <div class="container">
+        <h3>{{ header}}</h3>
+    </div>
     {% if surveys %}
     <div class="mb-3">
         <form action="/survey" class="form-group" method="post">

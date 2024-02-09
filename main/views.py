@@ -53,8 +53,12 @@ def treat_survey(request):
         else:
             choices = Choice.objects.filter(question__id=question.id)
             if choices.exists():
+                header = {
+                    "text": survey.text,
+                    "description": survey.description,
+                }
                 context = {
-                    "header": "Опрос: " + survey_id,
+                    "header": header,
                     "question": question,
                     "choices": choices,
                 }
