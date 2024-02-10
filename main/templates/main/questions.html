@@ -17,20 +17,20 @@
         </div>
         <div class="container">
             <form action="/questions" class="form-group" method="post">
-            {% csrf_token %}
-            
-            {% for choice in choices %}
-            <div class="container row justify-content-md-center gy-5">
-                <div class="col-4">           
-                    <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.question.id }}_{{ choice.id }}" autocomplete="off">
-                    <label class="btn d-block" for="option{{ forloop.counter }}">
-                        {{ choice.text }} 
-                        {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
-                    </label>
-                </div>
-            </div>    
-            {% endfor %}
-            <button class="btn btn-primary" type="submit">Ответить</button>
+                {% csrf_token %}
+                
+                {% for choice in choices %}
+                <div class="container row justify-content-md-center gy-5">
+                    <div class="col-4">           
+                        <input type="radio" class="btn-check" name="choice" id="option{{ forloop.counter }}" value="{{ choice.question.id }}_{{ choice.id }}" autocomplete="off">
+                        <label class="btn d-block" for="option{{ forloop.counter }}">
+                            {{ choice.text }} 
+                            {% if choice.description %}<p><sub>{{ choice.description }}</sub></p>{% endif %}
+                        </label>
+                    </div>
+                </div>    
+                {% endfor %}
+                <button class="btn btn-primary" type="submit">Ответить</button>
             </form>
         </div>
     </div>
