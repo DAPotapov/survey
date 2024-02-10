@@ -42,31 +42,23 @@ def treat_survey(request):
 
         # Задаем первый вопрос пользователю с вариантами ответа
         # или перенаправляем на страницу с ошибкой, если что-то не так
-        try:
-            question = Question.objects.get(
-                survey__id=survey_id, parent_question__isnull=True
-            )
-        except (Question.DoesNotExist, Question.MultipleObjectsReturned):
+        question = survey.first_question
+        choices = Choice.objects.filter(question__id=question.id)
+        if choices.exists():
+            header = {
+                "text": survey.text,
+                "description": survey.description,
+            }
+            context = {
+                "header": header,
+                "question": question,
+                "choices": choices,
+            }
+            return render(request, "main/questions.html", context)
+        else:
             return render(
                 request, "main/error.html", {"err_code": err_code, "error": error}
             )
-        else:
-            choices = Choice.objects.filter(question__id=question.id)
-            if choices.exists():
-                header = {
-                    "text": survey.text,
-                    "description": survey.description,
-                }
-                context = {
-                    "header": header,
-                    "question": question,
-                    "choices": choices,
-                }
-                return render(request, "main/questions.html", context)
-            else:
-                return render(
-                    request, "main/error.html", {"err_code": err_code, "error": error}
-                )
 
     # Отправляем пользователя на главную страницу, если он попытался зайти по прямой ссылке
     else:
