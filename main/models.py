@@ -1,11 +1,20 @@
+from tabnanny import verbose
 from django.db import models
 
 
 class Survey(models.Model):
-    """ Таблица с опросами """
+    """Таблица с опросами"""
 
     text = models.CharField(verbose_name="Название", max_length=255)
     description = models.TextField(verbose_name="Описание", blank=True)
+    first_question = models.OneToOneField(
+        verbose_name="Первый вопрос",
+        to="Question",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="from_survey",
+    )
 
     class Meta:
         verbose_name = "Опрос"
@@ -16,12 +25,13 @@ class Survey(models.Model):
 
 
 class Question(models.Model):
-    """ Таблица с вопросами """
+    """Таблица с вопросами"""
 
     text = models.CharField(verbose_name="Вопрос", max_length=255)
     description = models.TextField(verbose_name="Подробности вопроса", blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    start = models.BooleanField(verbose_name="Начало опроса", default=False)
+    # parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         verbose_name = "Вопрос"
@@ -32,14 +42,23 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    """ Таблица с вариантами ответов """
+    """Таблица с вариантами ответов"""
 
     text = models.CharField(verbose_name="Вариант ответа", max_length=255)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, related_name="choices"
+    )
     # Здесь умышленно иду по пути нормализации БД в ущерб производительности,
     # исходя из принципа "простое - лучше сложного"
     # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    next_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, related_name="lead_choices", default=None, null=True)
+    next_question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        blank=True,
+        related_name="lead_choices",
+        default=None,
+        null=True,
+    )
 
     class Meta:
         verbose_name = "Вариант ответа"
@@ -50,8 +69,8 @@ class Choice(models.Model):
 
 
 class UsersActivity(models.Model):
-    """ Таблица, хранящая записи о данных пользователем ответах на вопросы """
-    
+    """Таблица, хранящая записи о данных пользователем ответах на вопросы"""
+
     user_id = models.CharField(max_length=40)
     # В целях нормализации связь с survey через question
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
