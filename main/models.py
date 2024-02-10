@@ -30,7 +30,7 @@ class Question(models.Model):
     text = models.CharField(verbose_name="Вопрос", max_length=255)
     description = models.TextField(verbose_name="Подробности вопроса", blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    start = models.BooleanField(verbose_name="Начало опроса", default=False)
+    # start = models.BooleanField(verbose_name="Начало опроса", default=False)
     # parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
