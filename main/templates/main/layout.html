@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script> -->
-</head>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+          var msg = document.getElementById('msg');
+          if (msg){
+              setTimeout(function () {msg.setAttribute('hidden','')}, 3000);
+          };
+      });
+  </script>
+  </head>
 <body>
 
 
@@ -23,8 +31,18 @@
         </div>
       </div>  
   </nav>
+  
+{% if messages %}
+  <div class="justify-content-center fixed-top row text-center">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} col-3" id="msg" role="alert">
+      {{ message | safe }}
+  </div>
+  {% endfor %}
+  </div>
+{% endif %}
 
-  <main class="container-fluid py-3 text-center">
+  <main class="container py-3 text-center">
     {% block main %}{% endblock %}
   </main>
 

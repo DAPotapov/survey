@@ -1,4 +1,5 @@
 from django.db import DataError, connections
+from django.contrib import messages
 from django.shortcuts import render, redirect
 
 from .models import Question, Choice, Survey, UsersActivity
@@ -38,6 +39,16 @@ def treat_survey(request):
                 request, "main/error.html", {"err_code": err_code, "error": error}
             )
         else:
+            # Проверка, что пользователь не проходил опрос,
+            # Если проходил, то перенаправляем на главную вместе со всплывающим сообщением
+            finished_surveys = UsersActivity.objects.filter(
+                question__survey_id=survey_id,
+                user_id=request.session.session_key
+                )
+            if finished_surveys.exists():
+                messages.info(request, 'Вы уже проходили этот опрос')
+                return redirect('/')
+
             # Запоминаем выбранный опрос в сессии
             request.session["survey"] = {
                 "id": survey.id,
