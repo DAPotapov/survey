@@ -1,8 +1,9 @@
 from django.db import models
 
 
-# Create your models here.
 class Survey(models.Model):
+    """ Таблица с опросами """
+
     text = models.CharField(verbose_name="Название", max_length=255)
     description = models.TextField(verbose_name="Описание", blank=True)
 
@@ -15,12 +16,11 @@ class Survey(models.Model):
 
 
 class Question(models.Model):
+    """ Таблица с вопросами """
+
     text = models.CharField(verbose_name="Вопрос", max_length=255)
     description = models.TextField(verbose_name="Подробности вопроса", blank=True)
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    # TODO Нужно для определения первого вопроса. Ещё для чего?
-    # Лучше заменить булевым полем и сделать функцию проверки, что 1 вопрос - один
-    # Сейчас дублирует иерархию, определяемую вариантами ответов и может противоречить ей
     parent_question = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -32,10 +32,12 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
+    """ Таблица с вариантами ответов """
+
     text = models.CharField(verbose_name="Вариант ответа", max_length=255)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
     # Здесь умышленно иду по пути нормализации БД в ущерб производительности,
-    # Исходя из принципа "простое - лучше сложного"
+    # исходя из принципа "простое - лучше сложного"
     # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     next_question = models.ForeignKey(Question, on_delete=models.CASCADE, blank=True, related_name="lead_choices", default=None, null=True)
 
@@ -48,9 +50,10 @@ class Choice(models.Model):
 
 
 class UsersActivity(models.Model):
+    """ Таблица, хранящая записи о данных пользователем ответах на вопросы """
+    
     user_id = models.CharField(max_length=40)
-    # Do I need survey here? Because it already linked with question
-    # survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    # В целях нормализации связь с survey через question
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
 
@@ -59,5 +62,4 @@ class UsersActivity(models.Model):
         verbose_name_plural = "Активность пользователей"
 
     def __str__(self) -> str:
-        # TODO What should I return here?
         return str(self.user_id)
