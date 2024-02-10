@@ -11,7 +11,7 @@ def index(request):
     # результатам опросов. Следовательно, в остальных местах допускается использование ORM.
     surveys = Survey.objects.all()
 
-    # Каждый запрос на главную страницу создаёт новую сессию, 
+    # Каждый запрос на главную страницу создаёт новую сессию,
     # удобно для заполнения таблицы с результатами
     # request.session.create()
     content = {"header": "Доступные опросы", "surveys": surveys}
@@ -31,34 +31,39 @@ def treat_survey(request):
 
         # Получаем идентификатор выбранного опроса
         survey_id = request.POST.get("survey")
-        survey = Survey.objects.get(pk=survey_id)
-
-        # Запоминаем выбранный опрос в сессии
-        request.session["survey"] = {
-            "id": survey.id,
-            "text": survey.text,
-            "description": survey.description,
-        }
-
-        # Задаем первый вопрос пользователю с вариантами ответа
-        # или перенаправляем на страницу с ошибкой, если что-то не так
-        question = survey.first_question
-        choices = Choice.objects.filter(question__id=question.id)
-        if choices.exists():
-            header = {
-                "text": survey.text,
-                "description": survey.description,
-            }
-            context = {
-                "header": header,
-                "question": question,
-                "choices": choices,
-            }
-            return render(request, "main/questions.html", context)
-        else:
+        try:
+            survey = Survey.objects.get(pk=survey_id)
+        except (Survey.DoesNotExist, Question.MultipleObjectsReturned):
             return render(
                 request, "main/error.html", {"err_code": err_code, "error": error}
             )
+        else:
+            # Запоминаем выбранный опрос в сессии
+            request.session["survey"] = {
+                "id": survey.id,
+                "text": survey.text,
+                "description": survey.description,
+            }
+
+            # Задаем первый вопрос пользователю с вариантами ответа
+            # или перенаправляем на страницу с ошибкой, если что-то не так
+            question = survey.first_question
+            choices = Choice.objects.filter(question__id=question.id)
+            if choices.exists():
+                header = {
+                    "text": survey.text,
+                    "description": survey.description,
+                }
+                context = {
+                    "header": header,
+                    "question": question,
+                    "choices": choices,
+                }
+                return render(request, "main/questions.html", context)
+            else:
+                return render(
+                    request, "main/error.html", {"err_code": err_code, "error": error}
+                )
 
     # Отправляем пользователя на главную страницу, если он попытался зайти по прямой ссылке
     else:
