@@ -77,6 +77,9 @@ WSGI_APPLICATION = "survey.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 USER = os.environ.get("POSTGRES_USER")
 PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+DB_NAME = os.environ.get("POSTGRES_DB")
+HOST = os.environ.get("POSTGRES_HOST")
+PORT = os.environ.get("POSTGRES_PORT")
 DATABASES = {
     # "default": {
         # "ENGINE": "django.db.backends.sqlite3",
@@ -86,11 +89,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         # "NAME": "survey",
-        "NAME": "survey1",
+        "NAME": DB_NAME,
         "USER": USER,
         "PASSWORD": PASSWORD,
-        "HOST": "localhost",
-        "PORT": "5432",
+        "HOST": HOST,
+        "PORT": PORT,
     }
 }
 
