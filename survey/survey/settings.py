@@ -85,7 +85,8 @@ DATABASES = {
     # Use postgresql database instead
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "survey",
+        # "NAME": "survey",
+        "NAME": "survey1",
         "USER": USER,
         "PASSWORD": PASSWORD,
         "HOST": "localhost",
