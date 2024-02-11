@@ -27,6 +27,11 @@
         <button class="btn btn-primary" type="submit">Начать опрос</button>
         </form>
     </div>
+    
+    {% else %}
+    <div class="alert alert-info container justify-content-center row text-center">
+        <div class="col-3">Опросов пока нет</div>
+    </div>
     {% endif %}  
 
 {% endblock %}
