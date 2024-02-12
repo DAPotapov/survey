@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-load_dotenv() 
+load_dotenv()
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -142,5 +142,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Configure sessions
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-# SESSION_COOKIE_AGE = 1209600 
-# SESSION_COOKIE_NAME = 'survey_session' 
+# SESSION_COOKIE_AGE = 1209600
+# SESSION_COOKIE_NAME = 'survey_session'
