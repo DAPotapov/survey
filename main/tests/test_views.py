@@ -9,7 +9,7 @@ class TestIndexView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_no_surveys(self):
-        Survey.objects.all().delete()
+        Survey.objects.all().delete()        
         response = index(self)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["surveys"], [])
