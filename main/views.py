@@ -25,60 +25,64 @@ def treat_survey(request):
     и перенаправляет на страницу с вопросами
     """
 
-    if request.method == "POST":
-        # Заготавливаем данные для сообщения об ошибке
-        err_code = "404"
-        error = "Упс! Что-то пошло не так..."
+    # Отправляем пользователя на главную страницу, 
+    # если он попытался зайти по прямой ссылке
+    if request.method != "POST":
+        return redirect("/")
 
-        # Получаем идентификатор выбранного опроса
-        survey_id = request.POST.get("survey")
-        try:
-            survey = Survey.objects.get(pk=survey_id)
-        except (Survey.DoesNotExist, Question.MultipleObjectsReturned):
-            return render(
-                request, "main/error.html", {"err_code": err_code, "error": error}
+    # Если пользователь выбрал опрос
+
+    # Заготавливаем данные для сообщения об ошибке
+    err_code = "404"
+    error = "Упс! Что-то пошло не так..."
+
+    # Получаем идентификатор выбранного опроса
+    survey_id = request.POST.get("survey")
+    try:
+        survey = Survey.objects.get(pk=survey_id)
+    except (Survey.DoesNotExist, Question.MultipleObjectsReturned):
+        return render(
+            request, "main/error.html", {"err_code": err_code, "error": error}
+        )
+    else:
+        # Проверка, что пользователь не проходил опрос, 
+        # Если проходил, то перенаправляем на главную вместе со всплывающим сообщением
+        finished_surveys = UsersActivity.objects.filter(
+            question__survey_id=survey_id,
+            user_id=request.session.session_key
             )
-        else:
-            # Проверка, что пользователь не проходил опрос,
-            # Если проходил, то перенаправляем на главную вместе со всплывающим сообщением
-            finished_surveys = UsersActivity.objects.filter(
-                question__survey_id=survey_id,
-                user_id=request.session.session_key
-                )
-            if finished_surveys.exists():
-                messages.info(request, 'Вы уже проходили этот опрос')
-                return redirect('/')
+        if finished_surveys.exists():
+            messages.info(request, 'Вы уже проходили этот опрос')
+            return redirect('/')
 
-            # Запоминаем выбранный опрос в сессии
-            request.session["survey"] = {
-                "id": survey.id,
+        # Запоминаем выбранный опрос в сессии
+        request.session["survey"] = {
+            "id": survey.id,
+            "text": survey.text,
+            "description": survey.description,
+        }
+
+        # Задаем первый вопрос пользователю с вариантами ответа
+        # или перенаправляем на страницу с ошибкой, если что-то не так
+        question = survey.first_question
+        choices = Choice.objects.filter(question__id=question.id)
+        if choices.exists():
+            header = {
                 "text": survey.text,
                 "description": survey.description,
             }
+            context = {
+                "header": header,
+                "question": question,
+                "choices": choices,
+            }
+            return render(request, "main/questions.html", context)
+        else:
+            return render(
+                request, "main/error.html", {"err_code": err_code, "error": error}
+            )
 
-            # Задаем первый вопрос пользователю с вариантами ответа
-            # или перенаправляем на страницу с ошибкой, если что-то не так
-            question = survey.first_question
-            choices = Choice.objects.filter(question__id=question.id)
-            if choices.exists():
-                header = {
-                    "text": survey.text,
-                    "description": survey.description,
-                }
-                context = {
-                    "header": header,
-                    "question": question,
-                    "choices": choices,
-                }
-                return render(request, "main/questions.html", context)
-            else:
-                return render(
-                    request, "main/error.html", {"err_code": err_code, "error": error}
-                )
 
-    # Отправляем пользователя на главную страницу, если он попытался зайти по прямой ссылке
-    else:
-        return redirect("/")
 
 
 def treat_answer(request):
