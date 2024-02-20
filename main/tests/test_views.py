@@ -3,12 +3,14 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from main.views import index, treat_survey, treat_answer, statistics
 from main.models import Survey, Question, Choice, UsersActivity
+from main.factories import SurveyFactory, QuestionFactory, ChoiceFactory, UsersActivityFactory
 
 
 class TestIndexView(TestCase):
     def setUp(self):
         self.client = Client()
-        self.survey = Survey.objects.create(text="Sample Survey", description="Sample Survey description")
+        self.survey_factory = SurveyFactory()
+
 
     def test_index(self):
         response = self.client.get(reverse("home"))

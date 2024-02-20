@@ -49,16 +49,17 @@ class TestChoiceModel(TestCase):
 
 
 class TestUsersActivityModel(TestCase):
+    some_id = "350c88bb5d9f449e9d4040e1e36dd496"
     def setUp(self):
         self.user_activity = UsersActivityFactory(
-            user_id="350c88bb5d9f449e9d4040e1e36dd496"
+            user_id = self.some_id
         )
 
     def test_user_activity_user_id(self):
-        self.assertEqual(self.user_activity.user_id, "350c88bb5d9f449e9d4040e1e36dd496")
+        self.assertEqual(self.user_activity.user_id, self.some_id)
 
     def test_user_activity_str(self):
-        self.assertEqual(str(self.user_activity), "350c88bb5d9f449e9d4040e1e36dd496")
+        self.assertEqual(str(self.user_activity), self.some_id)
 
     def test_user_activity_other(self):
         self.assertIsNotNone(self.user_activity.choice)
