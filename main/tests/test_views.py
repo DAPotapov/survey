@@ -1,4 +1,5 @@
 import re
+import pprint
 from django.test import TestCase, Client
 from django.urls import reverse
 from main.views import index, treat_survey, treat_answer, statistics
@@ -10,7 +11,6 @@ class TestIndexView(TestCase):
     def setUp(self):
         self.client = Client()
         self.survey_factory = SurveyFactory()
-
 
     def test_index(self):
         response = self.client.get(reverse("home"))
@@ -27,6 +27,23 @@ class TestIndexView(TestCase):
 
 
 class TestStatisticsView(TestCase):
-    def test_statistics(self):
-        response = statistics(self)
+    def setUp(self):
+        self.client = Client()
+        self.activities = UsersActivityFactory.create_batch(3)
+
+    def test_statistics_open(self):
+        response = self.client.get(reverse("stats"))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/statistics.html")
+
+    def test_statistics_content(self):
+        response = self.client.get(reverse("stats"))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.context["stats"]), 0)
+
+    def test_statistics_empty(self):
+        Survey.objects.all().delete()
+        response = self.client.get(reverse("stats"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/error.html")
+        self.assertQuerySetEqual(response.context["error"], 'Надо же... ни одного опроса нет ещё...')
