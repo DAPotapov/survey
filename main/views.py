@@ -134,7 +134,7 @@ def treat_answer(request):
             if not choice.next_question:
                 stats = []
                 try:
-                    survey_results = get_results(
+                    survey_results = get_results_raw_sql(
                         request.session.get("survey", "")["id"]
                     )
                     survey_results["title"] = survey["text"]
@@ -176,10 +176,10 @@ def treat_answer(request):
         return redirect("/")
 
 
-def get_results(survey_id):
+def get_results_raw_sql(survey_id):
     """
     Функция подготавливает результаты опроса по заданному id.
-    С использование raw-SQL-запросов.
+    С использованием raw-SQL-запросов.
     """
 
     # Подключаемся к БД
@@ -275,6 +275,20 @@ def get_results(survey_id):
     return survey_stats
 
 
+def get_results_orm(survey_id):
+    """
+    Функция подготавливает результаты опроса по заданному id.
+    С использованием ORM.
+    """
+    
+    # Всего респондентов
+    respondent_count = UsersActivity.objects.filter(
+        question__survey_id=survey_id).distinct().count()
+
+
+
+    return respondent_count
+
 def statistics(request):
     """
     Функция заполняет страницу со статистикой.
@@ -293,7 +307,7 @@ def statistics(request):
     # Для каждого запроса в БД получаем результаты из соответствующей функции
     for survey in surveys:
         try:
-            survey_stats = get_results(survey.id)
+            survey_stats = get_results_raw_sql(survey.id)
         except (IndexError, TypeError):
             return render(
                 request,
