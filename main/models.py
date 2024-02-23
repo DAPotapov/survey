@@ -21,6 +21,15 @@ class Survey(models.Model):
 
     def __str__(self) -> str:
         return self.text
+    
+    def __repr__(self):
+        return f"""{{
+            'id': {self.id},
+            'text': {self.text},
+            'description': {self.description},
+            'first_question': {self.first_question},
+            }}
+            """
 
 
 class Question(models.Model):
@@ -36,6 +45,15 @@ class Question(models.Model):
 
     def __str__(self) -> str:
         return self.text
+    
+    def __repr__(self):
+        return f"""{{
+            'id': {self.id},
+            'text': {self.text},
+            'description': {self.description},
+            'survey': {self.survey},
+            }}
+            """
 
 
 class Choice(models.Model):
@@ -64,6 +82,15 @@ class Choice(models.Model):
     def __str__(self) -> str:
         return self.text
 
+    def __repr__(self) -> str:
+        return f"""{{
+            'id': {self.id},
+            'text': {self.text},
+            'question': {self.question},
+            'next_question': {self.next_question},
+            }}
+            """
+
 
 class UsersActivity(models.Model):
     """Таблица, хранящая записи о данных пользователем ответах на вопросы"""
@@ -79,3 +106,11 @@ class UsersActivity(models.Model):
 
     def __str__(self) -> str:
         return str(self.user_id)
+    
+    def __repr__(self) -> str:
+        return f"""{{
+            'user_id': self.user_id,
+            'question': self.question,
+            'choice': self.choice,
+            }}
+            """
