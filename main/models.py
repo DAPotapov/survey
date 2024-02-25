@@ -109,8 +109,8 @@ class UsersActivity(models.Model):
     
     def __repr__(self) -> str:
         return f"""{{
-            'user_id': self.user_id,
-            'question': self.question,
-            'choice': self.choice,
+            'user_id': {self.user_id},
+            'question': {self.question},
+            'choice': {self.choice},
             }}
             """
